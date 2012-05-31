@@ -1,8 +1,13 @@
+from django.conf import settings
 from django.db import models
 from django import forms
 
-from crispy_forms.layout import Fieldset as LayoutFieldset, Div
+from appconf import AppConf
 from orderable.models import Orderable
+
+
+class FormModelsAppConf(AppConf):
+    WIDGETS = ()
 
 
 class Form(models.Model):
@@ -18,6 +23,7 @@ class Form(models.Model):
         return type('DynamicForm%s' % self.pk, (base_class,), field_map)
 
     def get_layout(self, fields):
+        from crispy_forms.layout import Fieldset as LayoutFieldset, Div
         layout = []
         used_fields = []
         for fieldset in self.fieldsets.all():
@@ -63,11 +69,7 @@ class Fieldset(Orderable):
 
 
 class Widget(models.Model):
-    WIDGET_CHOICES = (
-        ('3-way-slider', '3 way slider'),
-        ('if-other-describe', 'If other describe'),
-    )
-    widget_type = models.CharField(max_length=200, choices=WIDGET_CHOICES)
+    widget_type = models.CharField(max_length=200, choices=settings.FORM_MODELS_WIDGETS)
 
     def __unicode__(self):
         return u'Widget %d (%s)' % (self.pk, self.get_widget_type_display())

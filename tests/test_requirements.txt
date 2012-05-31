@@ -1,0 +1,4 @@
+django-crispy-forms==1.1.4
+django-discover-runner==0.2
+nose==1.1.2
+factory-boy==1.1.3
