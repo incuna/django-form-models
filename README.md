@@ -1,5 +1,7 @@
 # Django Form Models
 
+[![Build Status](https://secure.travis-ci.org/incuna/django-form-models.png?branch=master)](http://travis-ci.org/incuna/django-form-models)
+
 A set of models for django's forms.
 
 ## What? There are loads of things that do stuff like this? Why another?
