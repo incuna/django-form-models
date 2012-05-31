@@ -7,7 +7,8 @@ from orderable.models import Orderable
 
 
 class FormModelsAppConf(AppConf):
-    WIDGETS = ()
+    # The choices for widget types. The key will be ouput as a class on the widget.
+    WIDGETS = (('custom', 'Custom'),)
 
 
 class Form(models.Model):
@@ -22,8 +23,32 @@ class Form(models.Model):
         field_map = dict((f.key, f.get_django_field()) for f in fields)
         return type('DynamicForm%s' % self.pk, (base_class,), field_map)
 
-    def get_layout(self, fields):
-        from crispy_forms.layout import Fieldset as LayoutFieldset, Div
+    def get_fields_by_widget(self, fields):
+        from crispy_forms.layout import Div
+        widget = None
+        for field in fields:
+            if field.widget and field.widget == widget:
+                # append to the previous widget
+                fields[fields.index(field) - 1].fields += (field.key,)
+                fields[fields.index(field)] = None
+            elif not field.widget == widget:
+                # create the widget
+                widget = field.widget
+                if widget:
+                    fields[fields.index(field)] = Div(field.key, css_class=field.widget.widget_type)
+                else:
+                    fields[fields.index(field)] = field.key
+            else:
+                # just swap in the key
+                fields[fields.index(field)] = field.key
+        return filter(None, fields)
+
+    def get_layout(self, fields=None):
+        from crispy_forms.layout import Fieldset as LayoutFieldset
+
+        if fields is None:
+            fields = self.field_set.all().select_related('widget')
+
         layout = []
         used_fields = []
         for fieldset in self.fieldsets.all():
@@ -32,25 +57,9 @@ class Form(models.Model):
                 if field.fieldset_id == fieldset.pk:
                     fieldset_fields.append(field)
                     used_fields.append(field)
-
-            widget = None
-            for field in fieldset_fields:
-                if field.widget and field.widget == widget:
-                    # append to the previous widget
-                    fieldset_fields[fieldset_fields.index(field) - 1].fields += (field.key,)
-                    fieldset_fields[fieldset_fields.index(field)] = None
-                elif not field.widget == widget:
-                    # create the widget
-                    widget = field.widget
-                    if widget:
-                        fieldset_fields[fieldset_fields.index(field)] = Div(field.key, css_class=field.widget.widget_type)
-                    else:
-                        fieldset_fields[fieldset_fields.index(field)] = field.key
-                else:
-                    # just swap in the key
-                    fieldset_fields[fieldset_fields.index(field)] = field.key
-            layout.append(LayoutFieldset(fieldset.legend, *filter(None, fieldset_fields)))
-        layout = [field.key for field in fields if field not in used_fields] + layout
+            layout.append(LayoutFieldset(fieldset.legend, *self.get_fields_by_widget(fieldset_fields)))
+        non_fieldset_fields = self.get_fields_by_widget([field for field in fields if field not in used_fields])
+        layout = non_fieldset_fields + layout
         return layout
 
     @property

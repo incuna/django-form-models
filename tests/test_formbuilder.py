@@ -1,18 +1,12 @@
 from django import forms
 from django.test import TestCase
 
+from crispy_forms.layout import Div, Fieldset as LayoutFieldset
+
+from form_models.models import Widget, FormModelsAppConf
+
+from factories import FormFactory, FieldFactory, ChoiceOptionFactory, WidgetFactory, FieldsetFactory
 from tools import assert_equal, assert_true
-
-from factories import FormFactory, FieldFactory, ChoiceOptionFactory
-
-
-class BasicModelLayoutTest(TestCase):
-
-    def test_basic_model_creation(self):
-        """You should be able to add a form."""
-        form = FormFactory.create()
-        field = FieldFactory.create()
-        choice = ChoiceOptionFactory.create()
 
 
 class TestFields(TestCase):
@@ -51,3 +45,35 @@ class TestFormGeneration(TestCase):
         dj_form = form.get_django_form_class(fields=[field])
         assert_equal(len(dj_form.base_fields), 1)
         assert_equal(type(dj_form.base_fields.values()[0]), type(field.get_django_field()))
+
+
+class TestWidgets(TestCase):
+
+    def test_settings(self):
+        assert_equal(Widget._meta.get_field_by_name('widget_type')[0].choices, FormModelsAppConf.WIDGETS)
+
+    def test_widget_layout(self):
+        widget = WidgetFactory.create()
+        field1 = FieldFactory.create(widget=widget)
+        field2 = FieldFactory.create(widget=widget, form=field1.form)
+        layout = field1.form.get_layout()
+        assert_equal(len(layout), 1)
+        assert_true(isinstance(layout[0], Div))
+        assert_equal(layout[0].css_class, widget.widget_type)
+        assert_true(field1.key in layout[0].fields)
+        assert_true(field2.key in layout[0].fields)
+
+    def test_widgets_in_fieldsets(self):
+        widget = WidgetFactory.create()
+        fieldset = FieldsetFactory.create()
+        field1 = FieldFactory.create(fieldset=fieldset, widget=widget, form=fieldset.form)
+        field2 = FieldFactory.create(fieldset=fieldset, widget=widget, form=fieldset.form)
+        layout = fieldset.form.get_layout()
+        assert_equal(len(layout), 1)
+        assert_true(isinstance(layout[0], LayoutFieldset))
+        assert_equal(len(layout[0].fields), 1)
+        layout_widget = layout[0].fields[0]
+        assert_true(isinstance(layout_widget, Div))
+        assert_equal(layout_widget.css_class, widget.widget_type)
+        assert_true(field1.key in layout_widget.fields)
+        assert_true(field2.key in layout_widget.fields)
