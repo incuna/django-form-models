@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.urlresolvers import get_callable
 from django.db import models
 from django import forms
 
@@ -9,6 +10,22 @@ from orderable.models import Orderable
 class FormModelsAppConf(AppConf):
     # The choices for widget types. The key will be ouput as a class on the widget.
     WIDGETS = (('custom', 'Custom'),)
+    FIELDS = (
+            'form_models.fields.CharField',
+            'form_models.fields.NumberField',
+            'form_models.fields.PercentageField',
+            'form_models.fields.ChoiceField',
+    )
+
+    def configure(self):
+        fields = self.configured_data['FIELDS']
+        FIELDS_BY_IDENTIFIER = {}
+        for field in fields:
+            cls = get_callable(field)
+            FIELDS_BY_IDENTIFIER[cls.identifier] = cls
+        keys = self.configured_data
+        keys.update({'FIELDS_BY_IDENTIFIER': FIELDS_BY_IDENTIFIER})
+        return keys
 
 
 class Form(models.Model):
@@ -89,19 +106,14 @@ class Field(Orderable):
         ('number', 'Number'),
         ('percentage', 'Percentage'),
         ('choice', 'Choice'),
-        ('free text', 'Free Text'),
+        ('char', 'Free Text'),
     )
-    DJANGO_FIELDS = {
-        'number': forms.IntegerField,
-        'percentage': forms.FloatField,
-        'choice': forms.ChoiceField,
-        'free text': forms.CharField,
-    }
     form = models.ForeignKey(Form)
     fieldset = models.ForeignKey(Fieldset, blank=True, null=True)
     widget = models.ForeignKey(Widget, blank=True, null=True)
     name = models.CharField(max_length=200)
     key = models.SlugField()
+    required = models.BooleanField(default=False)
     field_type = models.CharField(max_length=200, choices=FIELD_CHOICES)
 
     def __unicode__(self):
@@ -112,17 +124,13 @@ class Field(Orderable):
         ordering = ('fieldset', 'sort_order')
 
     def get_django_field(self):
-        field_class = self.DJANGO_FIELDS[self.field_type]
         kwargs = {
             'label': self.name,
-            'required': False,
+            'required': self.required,
         }
-        if self.field_type == 'choice':
-            kwargs['choices'] = [(None, '-----')] + [(c.pk, c.name) for c in self.choices.all()]
-        if self.field_type == 'percentage':
-            kwargs['min_value'] = 0
-            kwargs['max_value'] = 100
-        field = field_class(**kwargs)
+        field_class = settings.FORM_MODELS_FIELDS_BY_IDENTIFIER[self.field_type]()
+        kwargs.update(field_class.get_field_kwargs(self))
+        field = field_class.django_field(**kwargs)
         return field
 
 

@@ -19,8 +19,8 @@ class TestFields(TestCase):
         field = FieldFactory.build(field_type='percentage')
         assert_true(isinstance(field.get_django_field(), forms.FloatField))
 
-    def test_free_text_field(self):
-        field = FieldFactory.build(field_type='free text')
+    def test_choice_field(self):
+        field = FieldFactory.build(field_type='char')
         assert_true(isinstance(field.get_django_field(), forms.CharField))
 
     def test_choice_field(self):
