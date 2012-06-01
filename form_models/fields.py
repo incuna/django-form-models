@@ -9,16 +9,19 @@ class BaseField(object):
 
 class CharField(BaseField):
     identifier = 'char'
+    name = 'Character Field'
     django_field = forms.CharField
 
 
 class NumberField(BaseField):
     identifier = 'number'
+    name = 'Number Field'
     django_field = forms.IntegerField
 
 
 class PercentageField(BaseField):
     identifier = 'percentage'
+    name = 'Percentage Field'
     django_field = forms.FloatField
 
     def get_field_kwargs(self, instance):
@@ -27,6 +30,7 @@ class PercentageField(BaseField):
 
 class ChoiceField(BaseField):
     identifier = 'choice'
+    name = 'Choice Field'
     django_field = forms.ChoiceField
 
     def get_field_kwargs(self, instance):

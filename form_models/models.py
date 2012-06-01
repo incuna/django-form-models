@@ -20,11 +20,16 @@ class FormModelsAppConf(AppConf):
     def configure(self):
         fields = self.configured_data['FIELDS']
         FIELDS_BY_IDENTIFIER = {}
+        FIELD_CHOICES = []
         for field in fields:
             cls = get_callable(field)
             FIELDS_BY_IDENTIFIER[cls.identifier] = cls
+            FIELD_CHOICES.append((cls.identifier, cls.name))
         keys = self.configured_data
-        keys.update({'FIELDS_BY_IDENTIFIER': FIELDS_BY_IDENTIFIER})
+        keys.update({
+            'FIELDS_BY_IDENTIFIER': FIELDS_BY_IDENTIFIER,
+            'FIELD_CHOICES': FIELD_CHOICES,
+        })
         return keys
 
 
@@ -102,19 +107,13 @@ class Widget(models.Model):
 
 
 class Field(Orderable):
-    FIELD_CHOICES = (
-        ('number', 'Number'),
-        ('percentage', 'Percentage'),
-        ('choice', 'Choice'),
-        ('char', 'Free Text'),
-    )
     form = models.ForeignKey(Form)
     fieldset = models.ForeignKey(Fieldset, blank=True, null=True)
     widget = models.ForeignKey(Widget, blank=True, null=True)
     name = models.CharField(max_length=200)
     key = models.SlugField()
     required = models.BooleanField(default=False)
-    field_type = models.CharField(max_length=200, choices=FIELD_CHOICES)
+    field_type = models.CharField(max_length=200, choices=settings.FORM_MODELS_FIELD_CHOICES)
 
     def __unicode__(self):
         return self.name
