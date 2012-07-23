@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.urlresolvers import get_callable
 from django.db import models
 from django import forms
+from django.template.defaultfilters import slugify
 
 from appconf import AppConf
 from orderable.models import Orderable
@@ -117,6 +118,11 @@ class Field(Orderable):
 
     def __unicode__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.key:
+            self.key = slugify(self.name)
+        return super(Field, self).save(*args, **kwargs)
 
     class Meta:
         unique_together = ('form', 'key')
