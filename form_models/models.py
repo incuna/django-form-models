@@ -48,16 +48,17 @@ class Form(models.Model):
     def get_fields_by_widget(self, fields):
         from crispy_forms.layout import Div
         widget = None
+        widget_div = None
         for field in fields:
             if field.widget and field.widget == widget:
                 # append to the previous widget
-                fields[fields.index(field) - 1].fields += (field.key,)
+                fields[fields.index(widget_div)].fields += (field.key,)
                 fields[fields.index(field)] = None
             elif not field.widget == widget:
                 # create the widget
                 widget = field.widget
                 if widget:
-                    fields[fields.index(field)] = Div(field.key, css_class=field.widget.widget_type)
+                    widget_div = fields[fields.index(field)] = Div(field.key, css_class=field.widget.widget_type)
                 else:
                     fields[fields.index(field)] = field.key
             else:
