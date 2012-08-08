@@ -31,6 +31,10 @@ class TestFields(TestCase):
         assert_true(isinstance(dj_field, forms.ChoiceField))
         assert_equal(choice.name, dj_field.choices[-1][1])
 
+    def test_no_slug_provided(self):
+        field = FieldFactory.create(name='hello', key='')
+        assert_equal(field.key, 'hello')
+
 
 class TestFormGeneration(TestCase):
 
