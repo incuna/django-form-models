@@ -34,4 +34,4 @@ class ChoiceField(BaseField):
     django_field = forms.ChoiceField
 
     def get_field_kwargs(self, instance):
-        return {'choices': [(None, '-----')] + [(c.pk, c.name) for c in instance.choices.all()]}
+        return {'choices': [('', '-----')] + [(c.pk, c.name) for c in instance.choices.all()]}
