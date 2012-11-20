@@ -1,7 +1,7 @@
+from django import forms
 from django.conf import settings
 from django.core.urlresolvers import get_callable
 from django.db import models
-from django import forms
 from django.template.defaultfilters import slugify
 
 from appconf import AppConf
@@ -9,7 +9,7 @@ from orderable.models import Orderable
 
 
 class FormModelsAppConf(AppConf):
-    # The choices for widget types. The key will be ouput as a class on the widget.
+    # The choices for widget types. The key will be output as a class on the widget.
     WIDGETS = (('custom', 'Custom'),)
     FIELDS = (
             'form_models.fields.CharField',
@@ -35,10 +35,10 @@ class FormModelsAppConf(AppConf):
 
 
 class Form(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=255)
 
     def __unicode__(self):
-        return self.name
+        return u'%s' % self.name
 
     def get_django_form_class(self, base_class=forms.Form, fields=None):
         if not fields:
@@ -95,14 +95,14 @@ class Form(models.Model):
 
 class Fieldset(Orderable):
     form = models.ForeignKey(Form, related_name='fieldsets')
-    legend = models.CharField(max_length=200)
+    legend = models.CharField(max_length=255)
 
     def __unicode__(self):
-        return self.legend
+        return u'%s' % self.legend
 
 
 class Widget(models.Model):
-    widget_type = models.CharField(max_length=200, choices=settings.FORM_MODELS_WIDGETS)
+    widget_type = models.CharField(max_length=255, choices=settings.FORM_MODELS_WIDGETS)
 
     def __unicode__(self):
         return u'Widget %d (%s)' % (self.pk, self.get_widget_type_display())
@@ -112,13 +112,13 @@ class Field(Orderable):
     form = models.ForeignKey(Form)
     fieldset = models.ForeignKey(Fieldset, blank=True, null=True)
     widget = models.ForeignKey(Widget, blank=True, null=True)
-    name = models.CharField(max_length=200)
-    key = models.SlugField()
+    name = models.CharField(max_length=255)
+    key = models.SlugField(max_length=255)
     required = models.BooleanField(default=False)
-    field_type = models.CharField(max_length=200, choices=settings.FORM_MODELS_FIELD_CHOICES)
+    field_type = models.CharField(max_length=255, choices=settings.FORM_MODELS_FIELD_CHOICES)
 
     def __unicode__(self):
-        return self.name
+        return u'%s' % self.name
 
     def save(self, *args, **kwargs):
         if not self.key:
@@ -142,7 +142,7 @@ class Field(Orderable):
 
 class ChoiceOption(models.Model):
     field = models.ForeignKey(Field, related_name='choices')
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=255)
 
     def __unicode__(self):
-        return self.name
+        return u'%s' % self.name
