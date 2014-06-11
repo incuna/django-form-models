@@ -6,5 +6,5 @@ script: make test
 notifications:
   email: false
 install:
-  - pip install -r tests/test_requirements.txt
+  - pip install -r test_requirements.txt
   - pip install .
