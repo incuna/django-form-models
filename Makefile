@@ -1,7 +1,7 @@
 SHELL := '/bin/bash'
 
 test:
-	django-admin.py test --settings=tests.settings
+	python form_models/tests/run.py
 
 release:
 	python setup.py register sdist upload
