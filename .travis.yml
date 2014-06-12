@@ -6,6 +6,7 @@ script: make test
 notifications:
   email: false
 install:
+  - if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]]; then pip install --use-mirrors unittest2; fi
   - psql -c 'CREATE DATABASE django_form_models' -U postgres;
   - pip install -r test_requirements.txt
   - pip install .
