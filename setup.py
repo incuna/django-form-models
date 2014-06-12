@@ -8,7 +8,7 @@ setup(
         'django-orderable>=1.0.1',
         'django-appconf>=0.5',
     ],
-    version = '0.1.3',
+    version = '0.1.4',
     description = 'Sample models for modelling django forms and fields, and integrate with crispy forms layout.',
     author = 'Incuna Ltd',
     author_email = 'admin@incuna.com',
