@@ -6,13 +6,13 @@ import factory
 from form_models.models import Form, Field, ChoiceOption, Fieldset, Widget
 
 
-class FormFactory(factory.Factory):
+class FormFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Form
 
     name = 'Name'
 
 
-class FieldFactory(factory.Factory):
+class FieldFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Field
 
     form = factory.SubFactory(FormFactory)
@@ -21,21 +21,21 @@ class FieldFactory(factory.Factory):
     field_type = 'number'
 
 
-class ChoiceOptionFactory(factory.Factory):
+class ChoiceOptionFactory(factory.DjangoModelFactory):
     FACTORY_FOR = ChoiceOption
 
     field = factory.SubFactory(FieldFactory, field_type='choice')
     name = 'Name'
 
 
-class FieldsetFactory(factory.Factory):
+class FieldsetFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Fieldset
 
     form = factory.SubFactory(FormFactory)
     legend = 'Legend'
 
 
-class WidgetFactory(factory.Factory):
+class WidgetFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Widget
 
     widget_type = settings.FORM_MODELS_WIDGETS[0][0]
