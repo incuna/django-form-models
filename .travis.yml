@@ -16,4 +16,4 @@ install:
   - pip install $DJANGO
   - psql -c 'CREATE DATABASE django_form_models' -U postgres;
   - pip install -r test_requirements.txt
-  - pip install .
+  - pip install -e .
