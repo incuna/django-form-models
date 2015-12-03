@@ -6,8 +6,6 @@ notifications:
   email: false
 env:
   matrix:
-    - DJANGO='django~=1.4.0'
-    - DJANGO='django~=1.5.0'
     - DJANGO='django~=1.6.0'
     - DJANGO='django~=1.7.0'
     - DJANGO='django~=1.8.0'
