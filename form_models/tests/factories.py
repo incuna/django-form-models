@@ -7,13 +7,15 @@ from form_models.models import Form, Field, ChoiceOption, Fieldset, Widget
 
 
 class FormFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = Form
+    class Meta:
+        model = Form
 
     name = 'Name'
 
 
 class FieldFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = Field
+    class Meta:
+        model = Field
 
     form = factory.SubFactory(FormFactory)
     name = 'Name'
@@ -22,20 +24,23 @@ class FieldFactory(factory.DjangoModelFactory):
 
 
 class ChoiceOptionFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = ChoiceOption
+    class Meta:
+        model = ChoiceOption
 
     field = factory.SubFactory(FieldFactory, field_type='choice')
     name = 'Name'
 
 
 class FieldsetFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = Fieldset
+    class Meta:
+        model = Fieldset
 
     form = factory.SubFactory(FormFactory)
     legend = 'Legend'
 
 
 class WidgetFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = Widget
+    class Meta:
+        model = Widget
 
     widget_type = settings.FORM_MODELS_WIDGETS[0][0]

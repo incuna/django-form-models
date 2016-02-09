@@ -1,0 +1,6 @@
+[run]
+source = form_models
+omit = *tests*
+
+[report]
+show_missing = True
